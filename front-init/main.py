@@ -85,8 +85,17 @@ class MessageHandler:
         timestamp = datetime.now().strftime("%Y-%m-%d %H:%M:%S.%f")
         data = {timestamp: {"username": username, "message": message}}
 
-        with open(BASE_DIR.joinpath("storage/data.json"), 'a') as file:
-            json.dump(data, file, indent=2)
+        with open(BASE_DIR.joinpath("storage/data.json"), 'r+') as file:
+            try:
+                existing_data = json.load(file)
+            except json.decoder.JSONDecodeError:
+                existing_data = {}
+
+            existing_data.update(data)
+
+            file.seek(0)
+            json.dump(existing_data, file, indent=2)
+            file.truncate()
             file.write('\n')
 
 
